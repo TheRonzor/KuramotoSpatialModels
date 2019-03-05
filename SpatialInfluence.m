@@ -17,7 +17,7 @@ function S = SpatialInfluence(distances, funfunFunction, varargin)
     % advance and passed via the [distances] argument.
     %
     % TO DO: The error handling in this function does not exist.
-    
+    lower(funfunFunction)
     switch lower(funfunFunction)
         case 'inverse'
             S = (1./distances).^varargin{1};

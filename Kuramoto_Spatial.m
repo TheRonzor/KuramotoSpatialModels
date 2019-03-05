@@ -23,10 +23,10 @@ s.gridType = 'square';
 Nosc = GetNumberOfOscillators(s.gridType,s.N);
 pos = GetOscillatorPositions(s.gridType,s.N);
 
-s.metric = 'cityblock';
+s.metric = 1;
 dist = GetDistances(pos, s.metric);
 
-s.fun = 'cam';
+s.fun = 'inverse'; % The initial window doesn't care about this value, it will always be the first in the list
 s.funParams = 1;
 fDist = SpatialInfluence(dist, s.fun, s.funParams);
 
@@ -34,15 +34,17 @@ s.dt = 1e-2;
 s.k = 0;
 s.noise = 0;
 
+s.ColorMode = 1;
+
 %% Oscillator properties and initial conditions
 freqs = (rand(Nosc,1)*3 - 1);
 phases = rand(Nosc,1)*2*pi;
 
 %% Run numerical simulation
-[ctrlWindow, controls] = MakeControlWindow; updateControlDisplay;
+[ctrlWindow, controls] = MakeControlWindow(s); updateControlDisplay;
 while 1    
-    phases = GetNextState(phases,freqs,s.k,fDist,s.dt,s.noise);
-    PlotOsc(phases,pos,Nosc,plotSize)
+    phases = GetNextState(phases,freqs,s.k/Nosc,fDist,s.dt,s.noise);
+    PlotOsc(phases,pos,Nosc,plotSize, s.ColorMode)
     if MOV
         writeVideo(vid,getframe(gcf));
         framesSoFar = framesSoFar+1;
