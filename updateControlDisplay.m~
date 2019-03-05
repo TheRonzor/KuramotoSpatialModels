@@ -1,0 +1,24 @@
+function updateControlDisplay(src,evt)
+    persistent annot clr offset
+    
+    if isempty(clr)
+        clr = 'r';
+        offset = [0.05 0.05]
+    end
+    
+    % This is bad practice!
+    cWin = evalin('base', 'ctrlWindow');
+    c = evalin('base', 'controls');
+    
+    try
+        delete(annot.k)
+    end
+    annot.k = annotation(cWin, ...
+                'textbox', c.kSlider.Position([3]) + offset, ...
+                'textbox',[0.855 0.015 0.1 0.05], ...
+                'string', ['$k=$' num2str(c.kSlider.Value, '%.3f')], ...
+                'edgecolor', 'none', ...
+                'color', clr, ...
+                'fontsize', 20, ...
+                'interpreter', 'latex');
+end

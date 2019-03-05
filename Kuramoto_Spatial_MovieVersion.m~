@@ -1,0 +1,125 @@
+clear; clear PlotOsc GetColors;
+plotSize = 800;
+set(groot, 'DefaultFigurePosition', [0 0 plotSize plotSize])
+whitebg([0 0 0]); close all; clc;
+
+MOV = 0;
+if MOV
+    FPS = 60;
+    MINS = 2;
+    FRAMES = 60*MINS*FPS;
+    vid = MakeVid('RenameMe.mp4', FPS, 50);
+end
+
+%% Set the seed for reproducibility
+rng(101)
+
+%% keep track of frames if you want
+framesSoFar=0;
+
+%% The oscillators will be placed on a grid with characteristic scale:
+% Right now, the only option supported is a sqaure grid. As of 2019 March,
+% this is just the width of a square.
+
+% s is a structure that will help me save my settings. It should contain
+% the minimal amount of information needed to reconstruct a simulation.
+s.gridType = 'square'; 
+s.N = 50;
+s.dt = 0.005;
+
+%% Get the number of oscillators based on the parameters above
+Nosc = GetNumberOfOscillators(s.gridType, s.N);
+
+%% Get the spatial positions of each oscillator
+pos = GetOscillatorPositions(s.gridType, s.N);
+
+%% Compute the distance between each oscillator. 
+%   The function should be given an Nx2 list of Cartesian coordinates and 
+%   return an Nx1 vector of real numbers.
+%   
+%   Regarding available metrics, for now:
+%                                           doc pdist
+%
+%   and restrict your attention to 'euclidean' and 'cityblock' :-)
+s.metric = 'cityblock';
+dist = GetTheDistancesOf(pos, s.metric);
+
+%% Apply an optional function to the distance metric.  What fun!
+s.fun = 'sin';
+s.funParams = 3;
+fOfD = SpatialInfluence(dist, s.fun, s.funParams);
+
+%% Oscillator properties and initial conditions
+s.k = 28/Nosc;
+freqs = 1+rand(Nosc,1)*2;
+phases = rand(Nosc,1)*2*pi;
+
+%% Run numerical simulation
+while 1
+    phases = GetNextState(phases,freqs,s.k,fOfD,s.dt);
+    PlotOsc(phases,pos,Nosc,plotSize)
+    writeVideo(vid,getframe(gcf));
+    framesSoFar = framesSoFar+1;
+end
+close(vid);
+%% Helper functions
+function PlotOsc(phases,pos,Nosc,plotSize)
+    persistent figHandle s
+    if isempty(figHandle)
+        figHandle = figure;
+    else
+        figure(figHandle)
+        delete(s);
+    end
+    
+    %histogram(phases); return;
+    
+    % Plot the oscillators in the plane and color by phase
+    c = GetColors(phases);
+    s = scatter(pos(:,1), pos(:,2),plotSize^2/Nosc,c,'filled','s');
+    axis([0 max(pos(:))+1 0 max(pos(:))+1])
+    set(gca,'xtick', [], 'ytick', [], 'looseinset', [0 0 0 0]);
+    axis square; axis off; drawnow;
+end
+
+function newPhases = GetNextState(phases, naturalFreqs, coupling, spatialCoupling, dt)
+    persistent tau
+    if isempty(tau)
+        tau = 2*pi;
+    end
+    
+    %temp = repmat(phases',length(phases),1);
+    diffs = repmat(phases',length(phases),1) - phases;
+    sins = sin(diffs).*spatialCoupling;
+    sums = sum(sins,2);
+    
+    % Euler's method
+    newPhases = mod(phases + (naturalFreqs+4*randn(size(naturalFreqs)) + coupling.*sums)*dt,tau);
+    %newPhases = mod(phases + (naturalFreqs + coupling.*sums)*dt,tau);
+end
+
+function Colors = GetColors(phases)
+    persistent l o nColors cmap MODE;
+    if isempty(l)
+        l = length(phases);
+        o = zeros(l,1);
+        nColors = 1e6;
+        cmap = jet(nColors);
+        MODE = 1;
+    end
+    
+    switch MODE
+        % If phase is near pi , then color red, otherwise black
+        case 1
+            f = 1-abs(pi-phases)/pi;
+            f = f.^2;
+            Colors = [f o o];
+        case 2
+            % Use a full colormap
+            % Map phases to (0,1)
+            f = phases/2/pi;
+            % Map those values to integers 1 - 10,000
+            f = floor(1+(nColors-1)*f);
+            Colors = cmap(f,:);
+    end
+end
