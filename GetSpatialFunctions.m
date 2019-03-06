@@ -11,4 +11,5 @@ function funArray = GetSpatialFunctions
             i=i+1;
         end
     end
+    fclose(fid);
 end

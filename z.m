@@ -46,3 +46,9 @@ c = uicontrol(f,'Style','popupmenu');
 c.Position = [20 75 60 20];
 c.String = {'Celsius','Kelvin','Fahrenheit'};
 %c.Callback = @selection;
+
+close all;
+x = linspace(0,100,1000);
+y = 2./(1+exp((x-20)/2))-1;
+y = sin(x/5).*exp(-sqrt(x));
+plot(x,y)

@@ -1,31 +1,32 @@
-function Colors = GetColors(Phases, ColorMode)
-    persistent l o nColors cmap;
+function Colors = GetColors(Phases,ColorMode)
+    persistent l o nColors cmap pow;
     if isempty(l)
         l = length(Phases);
         o = zeros(l,1);
         nColors = 1e6;
-        cmap = jet(nColors);
+        cmap = hsv(nColors);
+        pow = 4;
+    end
+    
+    if ColorMode == 1
+        f = Phases/2/pi;
+        f = floor(1+(nColors-1)*f);
+        Colors = cmap(f,:);
+        return;
+    else
+        f = (1-abs(pi-Phases)/pi).^pow;
     end
     
     switch ColorMode
-        case 1
-            f = 1-abs(pi-Phases)/pi;
-            f = f.^2;
-            Colors = [f o o];
         case 2
-            f = 1-abs(pi-Phases)/pi;
-            f = f.^2;
-            Colors = [o f o];
+            Colors = [f o o];
         case 3
-            f = 1-abs(pi-Phases)/pi;
-            f = f.^2;
-            Colors = [o o f];
+            Colors = [o f o];
         case 4
-            % Use a full colormap
-            % Map phases to (0,1)
-            f = Phases/2/pi;
-            % Map those values to integers 1 - 10,000
-            f = floor(1+(nColors-1)*f);
-            Colors = cmap(f,:);
+            Colors = [o o f];
+        case 5
+            Colors = brighten([f 1-f o+1],-0.5);
+        case 6
+            Colors = brighten([(1-f)/3 f (1-f)/2], 0.2);
     end
 end

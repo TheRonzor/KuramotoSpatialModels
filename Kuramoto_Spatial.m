@@ -15,29 +15,31 @@ if MOV
 end
 
 %% Set the seed for reproducibility
-rng(111)
+rng(121)
 
 %% Simulation settings
-s.N = 50;
-s.gridType = 'square'; 
+if 1
+    s = table2struct(readtable('../Output/Settings_737489.805264826049.txt'));
+else
+    s.N = 40;
+    s.gridType = 'square'; 
+    s.metric = 1;
+    s.fun = 'inverse';
+    s.funParams = 1;
+    s.dt = 1e-2;
+    s.k = 0;
+    s.noise = 0;
+    s.ColorMode = 1;
+end
+
+%% Compute distances, etc.
 Nosc = GetNumberOfOscillators(s.gridType,s.N);
 pos = GetOscillatorPositions(s.gridType,s.N);
-
-s.metric = 1;
 dist = GetDistances(pos, s.metric);
-
-s.fun = 'inverse'; % The initial window doesn't care about this value, it will always be the first in the list
-s.funParams = 1;
 fDist = SpatialInfluence(dist, s.fun, s.funParams);
 
-s.dt = 1e-2;
-s.k = 0;
-s.noise = 0;
-
-s.ColorMode = 1;
-
 %% Oscillator properties and initial conditions
-freqs = (rand(Nosc,1)*3 - 1);
+freqs = -(randn(Nosc,1)*0.5 + 1);
 phases = rand(Nosc,1)*2*pi;
 
 %% Run numerical simulation
