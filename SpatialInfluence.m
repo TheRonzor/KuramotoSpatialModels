@@ -10,13 +10,17 @@ function S = SpatialInfluence(distances, funfunFunction, varargin)
     % Output:
     %       A transformed version of the input, meant to represent the
     %       influcene of all the phases on each other as a function of 
-    %       their host object's 'distance'.
+    %       their distance.
     %
     % TO DO: I'm not sure whether this function should accept things like
     % adjacency matrices, or if things like that should be handled in
     % advance and passed via the [distances] argument.
     %
     % TO DO: The error handling in this function does not exist.
+    
+    % To ensure that the code runs properly, DO NOT add any comments on the 
+    % same line as the case statements. This file is read by another function
+    % to generate a list of available options.
     
     switch lower(funfunFunction)
         case 'inverse'
@@ -29,14 +33,22 @@ function S = SpatialInfluence(distances, funfunFunction, varargin)
             S = cos(distances/varargin{1});
         case 'tan'
             S = tan(distances/varargin{1});
+        case 'tannorm'
+            S = tan(distances/varargin{1});
+            S = S/max(abs(S(:)));
         case 'cam'
             S = (distances-0).*(distances-20).*(distances-60).*exp(-distances*varargin{1});
         case 'sigmoid'
             S = 2./(1+exp(distances-10)/varargin{1})-1;
         case 'sinexp'
             S = sin(distances/varargin{1}).*exp(-sqrt(distances));
+            S = S/max(abs(S(:)));
+        case 'mlj'
+            S=-0.1*distances.^(-8)-varargin{1}*distances.^(-4)+1*distances.^(-1);
+            S = S/max(abs(S(:)));
         otherwise
             S = 1./distances;
     end
+    %% Any infinities or otherwise are set to 0.
     S(~isfinite(S)) = 0;
 end

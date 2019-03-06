@@ -10,6 +10,11 @@ function updateControlDisplay(src,~)
     if nargin < 1; src.Tag = 'init'; end
     
     % This is bad practice!  Better than global variables? :-)
+    % It would be better to pass these variables to the function,
+    % but I couldn't figure out how to do that.  The function is the
+    % callback function invoked when slider bars change, and I think I
+    % would need to restructure quite a bit of code.  So, I'm making liberal
+    % use of the evalin command which is not recommended!
     cWin = evalin('base', 'ctrlWindow');
     c = evalin('base', 'controls');
     Nosc = evalin('base', 'Nosc');
@@ -19,6 +24,9 @@ function updateControlDisplay(src,~)
         evalin('base',['s.k = ' num2str(c.kSlider.Value) ';']);
         try
             delete(annot.k)
+            % There is no need for a catch statement here.  The delete
+            % command will throw an error the first time this function is
+            % called and can be safely ignored.
         end
         annot.k = annotation(cWin, ...
                     'textbox', [c.kSlider.Position([3 2]) + offset 0.1 0.05], ...
@@ -109,5 +117,14 @@ function updateControlDisplay(src,~)
                     'color', clr, ...
                     'fontsize', 20, ...
                     'interpreter', 'latex');
+    end
+    
+    %% Update the distance function display if any distance related params changed
+    if any(strcmp(src.Tag, {'init', 'fun', 'param', 'metric'}))
+        d = unique(evalin('base', '[dist(:) fDist(:)]'),'rows');
+        dPlot = subplot(5,5, [2:4 7:9 12:14],'parent',cWin);
+        scatter(d(:,1),d(:,2),'.r', 'parent', dPlot);
+        xlabel(dPlot, 'Distance')
+        ylabel(dPlot, 'Influence')
     end
 end

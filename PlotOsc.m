@@ -1,4 +1,10 @@
 function PlotOsc(phases,pos,Nosc,plotSize,ColorMode)
+    % This function is superseded by PlotOsc2 and can be safely deleted in
+    % the next version.
+    disp('The function PlotOsc is deprecated. Use PlotOsc2 instead.')
+    return;
+    %----------------------------------------------------------------------
+    
     persistent figHandle s
     if isempty(figHandle)
         figHandle = figure('name', 'Oscillatory Behavior!','NumberTitle','off');
@@ -7,7 +13,7 @@ function PlotOsc(phases,pos,Nosc,plotSize,ColorMode)
         delete(s);
     end
     
-    % TODO[_]: Just update the s.XData, etc. properties. Main problem, this
+    % TODO[X]: Just update the s.XData, etc. properties. Main problem, this
     % keeps stealing focus to the main figure (making things 
     % like popupmenus problematic), and 2) I think it's slower
     % than it needs to be, since we're deleting and recreating the entire

@@ -1,9 +1,50 @@
-clear; clear PlotOsc GetColors;
-plotSize = 800;
+clear; clear PlotOsc2 GetColors; % These are for clearing persistent variables
+plotSize = 800; % I don't know if it works right when you change this.
 set(groot, 'DefaultFigurePosition', [0 0 plotSize plotSize])
 whitebg([0 0 0]); close all; clc;
+
+% Time stamp can be used as a unique identifier for saving things related 
+% to the current simulation
 tStamp = num2str(now, '%.12f');
 
+%% Set the seed for reproducibility
+rng(121)
+
+%% Simulation settings
+if 0
+    % If you have previously saved your settings, you can import them
+    % below. Otherwise, change the above line to if 0... and adjust
+    % parameters below.
+    s = table2struct(readtable('../Output/TravelingWave1.txt'));
+else
+    s.N = 40;               % The width of the grid (squared, the number of oscillators).
+    s.gridType = 'square';  % The only option is square. I might add hex or circular grids in the future.
+    s.metric = 1;           % The parameter for the Minkowski distance
+    s.fun = 'inverse';      % The spatial influence function
+    s.funParams = 1;        % The parameter for the spatial influence function
+    s.dt = 1e-2;            % Time step for Euler's method
+    s.k = 0;                % The initial coupling strength (it is divided by Nosc later).
+    s.noise = 0;            % The variance of the noise distribution (it will always have mean=0)
+    s.ColorMode = 1;        % The initial color mode, for showing phases.
+end
+
+%% Compute distances, etc.
+Nosc = GetNumberOfOscillators(s.gridType,s.N);
+pos = GetOscillatorPositions(s.gridType,s.N);
+dist = GetDistances(pos, s.metric);
+fDist = SpatialInfluence(dist, s.fun, s.funParams);
+
+%% Oscillator properties and initial conditions
+% Intrinsic frequencies are drawn from a folded normal distribution (they
+% are all positive).
+freqs = abs((randn(Nosc,1)*0.5 + 1));
+% The initial phases are uniformly selected from (0, 2pi).
+phases = rand(Nosc,1)*2*pi;
+
+%% Movies
+% Do not attempt to make movies unless you have read and understand all of
+% the code. It is very easy to generate enormous movie files if you are not
+% paying attention.
 MOV = 0;
 if MOV
     FPS = 60;
@@ -14,39 +55,13 @@ if MOV
     framesSoFar=0;
 end
 
-%% Set the seed for reproducibility
-rng(121)
-
-%% Simulation settings
-if 1
-    s = table2struct(readtable('../Output/Settings_737489.805264826049.txt'));
-else
-    s.N = 40;
-    s.gridType = 'square'; 
-    s.metric = 1;
-    s.fun = 'inverse';
-    s.funParams = 1;
-    s.dt = 1e-2;
-    s.k = 0;
-    s.noise = 0;
-    s.ColorMode = 1;
-end
-
-%% Compute distances, etc.
-Nosc = GetNumberOfOscillators(s.gridType,s.N);
-pos = GetOscillatorPositions(s.gridType,s.N);
-dist = GetDistances(pos, s.metric);
-fDist = SpatialInfluence(dist, s.fun, s.funParams);
-
-%% Oscillator properties and initial conditions
-freqs = -(randn(Nosc,1)*0.5 + 1);
-phases = rand(Nosc,1)*2*pi;
+%% Initialize control window
+[ctrlWindow, controls] = MakeControlWindow(s); updateControlDisplay;
 
 %% Run numerical simulation
-[ctrlWindow, controls] = MakeControlWindow(s); updateControlDisplay;
 while 1    
     phases = GetNextState(phases,freqs,s.k/Nosc,fDist,s.dt,s.noise);
-    PlotOsc(phases,pos,Nosc,plotSize, s.ColorMode)
+    PlotOsc2(phases,pos,Nosc,plotSize, s.ColorMode)
     if MOV
         writeVideo(vid,getframe(gcf));
         framesSoFar = framesSoFar+1;
@@ -67,7 +82,7 @@ function newPhases = GetNextState(phases, naturalFreqs, coupling, spatialCouplin
     sins = sin(diffs).*spatialCoupling;
     sums = sum(sins,2);
     
-    % Euler's method
+    % Euler's method (upgrade to Heun's if it's not too slow).
     if noise
         % With noise
         newPhases = mod(phases + (naturalFreqs+noise*randn(size(naturalFreqs)) + coupling.*sums)*dt,tau);
