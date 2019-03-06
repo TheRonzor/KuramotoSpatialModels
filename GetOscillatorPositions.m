@@ -3,7 +3,7 @@ function OscPositions = GetOscillatorPositions(configurationType, varargin)
     %       configurationType: square, hexagonal, circular, etc.
     %       
     %       varargin: Right now, just a number that 'characterizes' the
-    %       grid.  If nothing is passed, defaults to 10.
+    %       grid. If nothing is passed, defaults to 10.
     %
     % Output: 
     %       A list of Cartesian coordinates representing the center of

@@ -1,4 +1,11 @@
 function [ctrlWindow, controls] = MakeControlWindow(s)
+
+    % This function creates the parameter control window.
+    % The input, s, is a structure containing parameter values.
+    %
+    % The outputs are a handle to the figure, and a structure containing
+    % the slider bar objects.
+    
     ctrlWindow = figure('name', 'Parameter Control','NumberTitle', 'off');
     controls.kSlider = uicontrol('parent', ctrlWindow, ...
         'style','slider','units', 'normalized', ...

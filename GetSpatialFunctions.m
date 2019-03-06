@@ -1,5 +1,10 @@
 function funArray = GetSpatialFunctions
-% Generate a list of options defined in the SpatialInfluence function
+    % Function returns a cell array containing all of the spatial influence
+    % functions defined in SpatialInfluence.m.
+    %
+    % The code looks for lines with the word 'case' and returns the rest of
+    % the text on those lines.
+    
     fid = fopen('SpatialInfluence.m');
     i = 1;
     while ~feof(fid)

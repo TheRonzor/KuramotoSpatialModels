@@ -20,7 +20,8 @@ function S = SpatialInfluence(distances, funfunFunction, varargin)
     
     % To ensure that the code runs properly, DO NOT add any comments on the 
     % same line as the case statements. This file is read by another function
-    % to generate a list of available options.
+    % to generate a list of available options.  If you add comments, do it
+    % either above or below the 'case' statements.
     
     switch lower(funfunFunction)
         case 'inverse'
@@ -43,12 +44,15 @@ function S = SpatialInfluence(distances, funfunFunction, varargin)
         case 'sinexp'
             S = sin(distances/varargin{1}).*exp(-sqrt(distances));
             S = S/max(abs(S(:)));
+        case 'cosexp'
+            S = cos(distances/varargin{1}).*exp(-sqrt(distances));
+            S = S/max(abs(S(:)));
         case 'mlj'
             S=-0.1*distances.^(-8)-varargin{1}*distances.^(-4)+1*distances.^(-1);
             S = S/max(abs(S(:)));
         otherwise
             S = 1./distances;
     end
-    %% Any infinities or otherwise are set to 0.
+    % Any infinities or otherwise are set to 0.
     S(~isfinite(S)) = 0;
 end

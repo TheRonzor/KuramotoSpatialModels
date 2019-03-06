@@ -1,4 +1,10 @@
 function updateControlDisplay(src,~)
+    % This function adds text boxes to the control window, and updates the
+    % Influence vs Distance plot as needed.
+    
+    % This function is meant to be used as a callback function assigned to
+    % the slider bars.
+    
     persistent annot clr offset
     if isempty(clr)
         clr = 'w';

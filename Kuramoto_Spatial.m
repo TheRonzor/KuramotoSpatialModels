@@ -1,30 +1,45 @@
+%% The KuramotRon
+%   This script runs the simulation!  See the ReadMe for more information
+%
+%   Ronald D. Smith
+%   College of William & Mary
+%   2019 March
+%--------------------------------------------------------------------------
+
 clear; clear PlotOsc2 GetColors; % These are for clearing persistent variables
-plotSize = 800; % I don't know if it works right when you change this.
+
+% I don't know if it works right when you change this, but the idea is that
+% if you change the size of the plot, the MarkerSize of the plots will
+% scale with it.  I had some trouble figuring out how to go from the
+% plotSize to the MarkerSize.  I know it works for plotSize=800 though!
+plotSize = 800; 
+
+% Set the default plot size, and make the background dark.
 set(groot, 'DefaultFigurePosition', [0 0 plotSize plotSize])
 whitebg([0 0 0]); close all; clc;
 
-% Time stamp can be used as a unique identifier for saving things related 
+% tStamp can be used as a unique identifier for saving things related 
 % to the current simulation
 tStamp = num2str(now, '%.12f');
 
-%% Set the seed for reproducibility
+%% Set the random seed for reproducibility
 rng(121)
 
 %% Simulation settings
 if 0
     % If you have previously saved your settings, you can import them
-    % below. Otherwise, change the above line to if 0... and adjust
-    % parameters below.
+    % below and change the above line to 'if 1'.  Otherwise, you can set
+    % the initial parameters in the 'else' block below.
     s = table2struct(readtable('../Output/TravelingWave1.txt'));
 else
     s.N = 40;               % The width of the grid (squared, the number of oscillators).
     s.gridType = 'square';  % The only option is square. I might add hex or circular grids in the future.
-    s.metric = 1;           % The parameter for the Minkowski distance
-    s.fun = 'inverse';      % The spatial influence function
-    s.funParams = 1;        % The parameter for the spatial influence function
-    s.dt = 1e-2;            % Time step for Euler's method
-    s.k = 0;                % The initial coupling strength (it is divided by Nosc later).
-    s.noise = 0;            % The variance of the noise distribution (it will always have mean=0)
+    s.metric = 2;           % The parameter for the Minkowski distance
+    s.fun = 'sinexp';       % The spatial influence function
+    s.funParams = 3;        % The parameter for the spatial influence function
+    s.dt = 0.05;            % Time step for Euler's method
+    s.k = 25;               % The initial coupling strength (it is divided by Nosc later).
+    s.noise = 0.3;          % The variance of the noise distribution (it will always have mean=0)
     s.ColorMode = 1;        % The initial color mode, for showing phases.
 end
 
@@ -61,7 +76,9 @@ end
 %% Run numerical simulation
 while 1    
     phases = GetNextState(phases,freqs,s.k/Nosc,fDist,s.dt,s.noise);
-    PlotOsc2(phases,pos,Nosc,plotSize, s.ColorMode)
+    if PlotOsc2(phases,pos,Nosc,plotSize, s.ColorMode) == 0
+        break;
+    end
     if MOV
         writeVideo(vid,getframe(gcf));
         framesSoFar = framesSoFar+1;

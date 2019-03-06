@@ -1,4 +1,8 @@
 function Colors = GetColors(Phases,ColorMode)
+    % Input is an Nx1 list of phases, and an integer indicating the color mode
+    % to use.
+    
+    % Output is an Nx3 list of RGB values.
     persistent l o nColors cmap pow;
     if isempty(l)
         l = length(Phases);
