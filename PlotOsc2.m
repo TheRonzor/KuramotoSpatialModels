@@ -16,12 +16,14 @@ function [status, figHand] = PlotOsc2(pos,Nosc,plotSize,Colors)
         axis([0 max(pos(:))+1 0 max(pos(:))+1])
         set(gca,'xtick', [], 'ytick', [], 'looseinset', [0 0 0 0]);
         axis square; axis off; drawnow;
+        figHand = figHandle;
     else
         try
             s.XData = pos(:,1);
             s.YData = pos(:,2);
             s.CData = Colors;
             drawnow;
+            figHand = figHandle;
         catch ex
             % If the window was closed, then end the simulation.
             close all;
@@ -36,8 +38,8 @@ function [status, figHand] = PlotOsc2(pos,Nosc,plotSize,Colors)
             end
             % Return a flag telling the script to terminate.
             status = 0;
+            figHand = [];
             return;
         end
     end
-    figHand = figHandle;
 end
