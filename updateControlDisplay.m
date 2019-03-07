@@ -128,7 +128,8 @@ function updateControlDisplay(src,~)
     %% Update the distance function display if any distance related params changed
     if any(strcmp(src.Tag, {'init', 'fun', 'param', 'metric'}))
         d = unique(evalin('base', '[dist(:) fDist(:)]'),'rows');
-        dPlot = subplot(5,5, [2:4 7:9 12:14],'parent',cWin);
+        %dPlot = subplot(5,5, [2:4 7:9 12:14],'parent',cWin);
+        dPlot = subplot(2,2, 1,'parent',cWin);
         scatter(d(:,1),d(:,2),'.r', 'parent', dPlot);
         xlabel(dPlot, 'Distance')
         ylabel(dPlot, 'Influence')

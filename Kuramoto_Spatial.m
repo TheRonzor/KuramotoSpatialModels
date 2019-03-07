@@ -6,7 +6,7 @@
 %   2019 March
 %--------------------------------------------------------------------------
 
-clear; clear PlotOsc2 GetColors; % These are for clearing persistent variables
+clear; clear PlotOsc2 PlotOscOnCircle GetColors; % These are for clearing persistent variables
 
 % I don't know if it works right when you change this, but the idea is that
 % if you change the size of the plot, the MarkerSize of the plots will
@@ -30,7 +30,7 @@ if 1
     % If you have previously saved your settings, you can import them
     % below and change the above line to 'if 1'.  Otherwise, you can set
     % the initial parameters in the 'else' block below.
-    s = table2struct(readtable('../Output/WaveWheels.txt'));
+    s = table2struct(readtable('../Output/TravelingWave1.txt'));
 else
     s.N = 40;               % The width of the grid (squared, the number of oscillators).
     s.gridType = 'square';  % The only option is square. I might add hex or circular grids in the future.
@@ -60,7 +60,7 @@ phases = rand(Nosc,1)*2*pi;
 % Do not attempt to make movies unless you have read and understand all of
 % the code. It is very easy to generate enormous movie files if you are not
 % paying attention.
-MOV = 1;
+MOV = 0;
 if MOV
     FPS = 30;
     MINS = 1;
@@ -76,11 +76,16 @@ end
 %% Run numerical simulation
 while 1    
     phases = GetNextState(phases,freqs,s.k/Nosc,fDist,s.dt,s.noise);
-    if PlotOsc2(phases,pos,Nosc,plotSize, s.ColorMode) == 0
+    c = GetColors(phases,s.ColorMode);
+    if PlotOscOnCircle(phases,ctrlWindow,c) == 0
+        break;
+    end
+    [status, fHand] = PlotOsc2(pos,Nosc,plotSize,c);
+    if  status == 0
         break;
     end
     if MOV
-        writeVideo(vid,getframe(gcf));
+        writeVideo(vid,getframe(figHand));
         framesSoFar = framesSoFar+1;
         if framesSoFar>=FRAMES
             break;
