@@ -26,11 +26,11 @@ tStamp = num2str(now, '%.12f');
 rng(121)
 
 %% Simulation settings
-if 0
+if 1
     % If you have previously saved your settings, you can import them
     % below and change the above line to 'if 1'.  Otherwise, you can set
     % the initial parameters in the 'else' block below.
-    s = table2struct(readtable('../Output/TravelingWave1.txt'));
+    s = table2struct(readtable('../Output/WaveWheels.txt'));
 else
     s.N = 40;               % The width of the grid (squared, the number of oscillators).
     s.gridType = 'square';  % The only option is square. I might add hex or circular grids in the future.
@@ -60,10 +60,10 @@ phases = rand(Nosc,1)*2*pi;
 % Do not attempt to make movies unless you have read and understand all of
 % the code. It is very easy to generate enormous movie files if you are not
 % paying attention.
-MOV = 0;
+MOV = 1;
 if MOV
-    FPS = 60;
-    MINS = 2;
+    FPS = 30;
+    MINS = 1;
     FRAMES = 60*MINS*FPS;
     QUAL = 50;    
     vid = MakeVid(['../Output/Kuramoto_' tStamp '_.mp4'], FPS, QUAL);
