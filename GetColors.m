@@ -9,7 +9,7 @@ function Colors = GetColors(Phases,ColorMode)
         o = zeros(l,1);
         nColors = 1e6;
         cmap = hsv(nColors);
-        pow = 4;
+        pow = 10;
     end
     
     if ColorMode == 1

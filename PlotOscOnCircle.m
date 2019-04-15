@@ -1,5 +1,7 @@
 function status = PlotOscOnCircle(phases, cWin, colors)
-    % Plots the oscillators on a circle in the control window
+    % Plots the oscillators on a circle in the control window, ignoring
+    % their spatial information.
+    %
     % Return 1 if succesful, 0 if any error occurs
     persistent s dPlot
     status = 1;
