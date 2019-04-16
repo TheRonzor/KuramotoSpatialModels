@@ -1,0 +1,2 @@
+N,gridType,metric,fun,funParams,dt,k,noise,ColorMode
+50,square,4,tan,7,0.10998,0.29999,0,4

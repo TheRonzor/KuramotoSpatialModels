@@ -30,7 +30,7 @@ if 1
     % If you have previously saved your settings, you can import them
     % below and change the above line to 'if 1'.  Otherwise, you can set
     % the initial parameters in the 'else' block below.
-    s = table2struct(readtable('../Output/DiagonalCheckerWave.txt'));
+    s = table2struct(readtable('./Output/DiagonalCheckerWave.txt'));
 else
     s.N = 40;               % The width of the grid (squared, the number of oscillators).
     s.gridType = 'square';  % The only option is square. I might add hex or circular grids in the future.

@@ -1,0 +1,2 @@
+N,gridType,metric,fun,funParams,dt,k,noise,ColorMode
+40,square,4,cam,3,0.10998,12,0,1

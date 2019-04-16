@@ -1,0 +1,2 @@
+N,gridType,metric,fun,funParams,dt,k,noise
+50,square,2,cam,2,0.10998,9,0.65254
